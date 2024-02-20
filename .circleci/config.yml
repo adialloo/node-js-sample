@@ -2,27 +2,23 @@ version: 2.1
 
 jobs:
   build:
-    docker:
-      - image: circleci/node:latest
+    machine:
+      image: ubuntu-2004:202201-01
 
     steps:
       - checkout
 
-      # Installer Yarn
+      # Installer curl
       - run:
-          name: Install Yarn
-          command: |
-            sudo apt-get update && sudo apt-get install -y curl
-            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            sudo apt-get update && sudo apt-get install -y yarn
+          name: Install Curl
+          command: sudo apt-get update && sudo apt-get install -y curl
 
-      - setup_remote_docker
-
+      # Construction de l'image Docker
       - run:
           name: Build Docker Image
           command: |
             docker build -t nodeapp .
+
       # Démarrer le serveur dans un conteneur Docker
       - run:
           name: Run Docker Container
@@ -33,21 +29,12 @@ jobs:
       - run:
           name: Wait for Server Startup
           command: sleep 10
+
+      # Vérifier la réponse du serveur
       - run:
           name: Check Page Response
           command: |
             curl -I http://localhost:8080
-      # Tester l'image Docker (facultatif)
-      # Ajoutez ici vos étapes de test si nécessaire
-
-      # Publication de l'image Docker sur Docker Hub (facultatif)
-      # Remplacez 'nom_de_votre_image' par le nom de votre image sur Docker Hub
-      # - run:
-      #     name: Publish Docker Image
-      #     command: |
-      #       docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-      #       docker tag nom_de_votre_image $DOCKERHUB_USERNAME/nom_de_votre_image
-      #       docker push $DOCKERHUB_USERNAME/nom_de_votre_image
 
 workflows:
   version: 2
