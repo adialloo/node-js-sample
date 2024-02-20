@@ -17,15 +17,22 @@ jobs:
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
             sudo apt-get update && sudo apt-get install -y yarn
 
-      # Installer Docker
       - setup_remote_docker
 
-      # Construction de l'image Docker
       - run:
           name: Build Docker Image
           command: |
             docker build -t nodeapp .
+      # Démarrer le serveur dans un conteneur Docker
+      - run:
+          name: Run Docker Container
+          command: |
+            docker run -d -p 8080:8080 --name nodeapp_container nodeapp
 
+      # Attendre que le serveur démarre
+      - run:
+          name: Wait for Server Startup
+          command: sleep 10
       - run:
           name: Check Page Response
           command: |
