@@ -26,6 +26,10 @@ jobs:
           command: |
             docker build -t nodeapp .
 
+      - run:
+          name: Check Page Response
+          command: |
+            curl -I http://localhost:8080
       # Tester l'image Docker (facultatif)
       # Ajoutez ici vos étapes de test si nécessaire
 
