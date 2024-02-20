@@ -8,33 +8,40 @@ jobs:
     steps:
       - checkout
 
-      # Installer curl
       - run:
           name: Install Curl
           command: sudo apt-get update && sudo apt-get install -y curl
 
-      # Construction de l'image Docker
       - run:
           name: Build Docker Image
           command: |
             docker build -t nodeapp .
 
-      # Démarrer le serveur dans un conteneur Docker
       - run:
           name: Run Docker Container
           command: |
             docker run -d -p 8080:8080 --name nodeapp_container nodeapp
 
-      # Attendre que le serveur démarre
       - run:
           name: Wait for Server Startup
           command: sleep 10
 
-      # Vérifier la réponse du serveur
       - run:
           name: Check Page Response
           command: |
             curl -I http://localhost:8080
+
+      - run:
+          name: Login to Docker Hub
+          command: |
+            echo "#Gnagna45*" | docker login -u "d0coeur" --password-stdin
+
+      # Pousser l'image Docker vers Docker Hub
+      - run:
+          name: Push Docker Image to Docker Hub
+          command: |
+            docker tag nodeapp "d0coeur/nodeapp"
+            docker push "d0coeur/nodeapp"
 
 workflows:
   version: 2
